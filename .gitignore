@@ -15,7 +15,7 @@ vendor/
 *.key
 *.srl
 *.pem
-
+*.lock.hcl
 .terraform
 *.tfstate*
 
