@@ -241,6 +241,15 @@ resource "aws_s3_bucket" "aws4" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "aws4" {
+  bucket = aws_s3_bucket.aws4.id
+
+  block_public_acls   = true
+  block_public_policy = true
+  restrict_public_buckets = true 
+  ignore_public_acls = true
+}
+
 resource "aws_iam_role" "aakulov-aws4-iam-role-ec2-s3" {
   name = "aakulov-aws4-iam-role-ec2-s3"
   assume_role_policy = jsonencode({
