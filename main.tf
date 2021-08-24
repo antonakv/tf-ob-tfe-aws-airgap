@@ -295,7 +295,10 @@ resource "aws_iam_role_policy" "aakulov-aws4-ec2-s3" {
           "s3:ListAccessPoints",
           "s3:ListJobs",
           "s3:PutStorageLensConfiguration",
-          "s3:CreateJob"
+          "s3:CreateJob",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
         ],
         "Resource" : "*"
       },

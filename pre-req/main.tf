@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "aws4-airgap" {
 }
 
 resource "aws_iam_role" "aakulov-aws4-iam-role-airgap" {
-  name = "aakulov-aws4-iam-role-ec2-s3"
+  name = "aakulov-aws4-iam-role-ec2-s3-airgap"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -78,6 +78,35 @@ resource "aws_s3_bucket_public_access_block" "aakulov-aws4-iam-role-airgap" {
   restrict_public_buckets = true 
   ignore_public_acls = true
 }
+
+resource "aws_s3_bucket_object" "upload1" {
+  bucket = aws_s3_bucket.aws4-airgap.id
+  key = "latest.tar.gz"
+  source = "upload/latest.tar.gz"
+  etag = filemd5("upload/latest.tar.gz")
+}
+
+resource "aws_s3_bucket_object" "upload2" {
+  bucket = aws_s3_bucket.aws4-airgap.id
+  key = "replicated.conf"
+  source = "upload/replicated.conf"
+  etag = filemd5("upload/replicated.conf")
+}
+
+resource "aws_s3_bucket_object" "upload3" {
+  bucket = aws_s3_bucket.aws4-airgap.id
+  key = "settings.json"
+  source = "upload/settings.json"
+  etag = filemd5("upload/settings.json")
+}
+
+resource "aws_s3_bucket_object" "upload4" {
+  bucket = aws_s3_bucket.aws4-airgap.id
+  key = "license.rli"
+  source = "upload/license.rli"
+  etag = filemd5("upload/license.rli")
+}
+
 
 output "s3_bucket_for_tf-ob-tfe-aws-airgap" {
   value = aws_s3_bucket.aws4-airgap.arn
