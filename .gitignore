@@ -15,7 +15,7 @@ vendor/
 *.key
 *.srl
 *.pem
-
+*.lock.hcl
 .terraform
 *.tfstate*
 
@@ -25,3 +25,5 @@ Gemfile.lock
 
 cert/
 tfe/
+
+upload/
