@@ -236,6 +236,7 @@ resource "aws_instance" "aws4" {
 resource "aws_s3_bucket" "aws4" {
   bucket = "aakulov-aws4-tfe-data"
   acl    = "private"
+  force_destroy = true
   tags = {
     Name = "aakulov-aws4-tfe-data"
   }
