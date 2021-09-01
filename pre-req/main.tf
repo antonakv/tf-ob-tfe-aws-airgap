@@ -107,6 +107,13 @@ resource "aws_s3_bucket_object" "upload4" {
   etag = filemd5("upload/license.rli")
 }
 
+resource "aws_s3_bucket_object" "upload5" {
+  bucket = aws_s3_bucket.aws4-airgap.id
+  key = "Terraform Enterprise - 557.airgap"
+  source = "upload/Terraform Enterprise - 557.airgap"
+  etag = filemd5("upload/Terraform Enterprise - 557.airgap")
+}
+
 
 output "s3_bucket_for_tf-ob-tfe-aws-airgap" {
   value = aws_s3_bucket.aws4-airgap.arn

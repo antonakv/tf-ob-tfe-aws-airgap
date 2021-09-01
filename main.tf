@@ -213,6 +213,7 @@ resource "aws_db_instance" "aws4" {
   password              = var.db_password
   instance_class        = "db.t2.micro"
   db_subnet_group_name  = aws_db_subnet_group.aws4.name
+  vpc_security_group_ids = [aws_security_group.aakulov-aws4.id]
   skip_final_snapshot   = true
   tags = {
     Name = "aakulov-aws4"
@@ -315,5 +316,9 @@ resource "aws_iam_role_policy" "aakulov-aws4-ec2-s3" {
 
 output "aws_url" {
   value = aws_route53_record.aws4.name
+}
+
+output "aws_db_url" {
+  value = aws_db_instance.aws4.address
 }
 
