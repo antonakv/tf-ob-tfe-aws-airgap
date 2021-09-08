@@ -307,8 +307,8 @@ resource "aws_iam_role_policy" "aakulov-aws4-ec2-s3" {
   })
 }
 
-data "template_file" "settings_json_sh" {
-  template = file("templates/settings.json.sh.tpl")
+data "template_file" "install_tfe_sh" {
+  template = file("templates/install_tfe.sh.tpl")
   vars = {
     enc_password  = var.enc_password
     hostname      = var.tfe_hostname
@@ -325,15 +325,9 @@ data "template_cloudinit_config" "aws4_cloudinit" {
   base64_encode = true
 
   part {
-    filename     = "settings.json.sh"
-    content_type = "text/x-shellscript"
-    content      = data.template_file.settings_json_sh.rendered
-  }
-
-  part {
     filename     = "install_tfe.sh"
     content_type = "text/x-shellscript"
-    content      = file("scripts/install_tfe.sh")
+    content      = data.template_file.install_tfe_sh.rendered
   }
 }
 
