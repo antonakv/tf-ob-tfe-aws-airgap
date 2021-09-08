@@ -11,3 +11,10 @@ variable "db_password" {
   type      = string
   sensitive = true
 }
+variable "enc_password" {
+  type      = string
+  sensitive = true
+}
+variable "tfe_hostname" {
+  type      = string
+}

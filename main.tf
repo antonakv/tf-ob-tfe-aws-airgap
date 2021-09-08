@@ -178,6 +178,13 @@ resource "aws_security_group" "aakulov-aws4" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    self      = true
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -188,7 +195,7 @@ resource "aws_security_group" "aakulov-aws4" {
 
 resource "aws_route53_record" "aws4" {
   zone_id         = "Z077919913NMEBCGB4WS0"
-  name            = "tfe4.anton.hashicorp-success.com"
+  name            = var.tfe_hostname
   type            = "A"
   ttl             = "300"
   records         = [aws_instance.aws4.public_ip]
@@ -204,38 +211,25 @@ resource "aws_db_subnet_group" "aws4" {
 }
 
 resource "aws_db_instance" "aws4" {
-  allocated_storage     = 20
-  max_allocated_storage = 100
-  engine                = "postgres"
-  engine_version        = "12.7"
-  name                  = "mydbtfe"
-  username              = "postgres"
-  password              = var.db_password
-  instance_class        = "db.t2.micro"
-  db_subnet_group_name  = aws_db_subnet_group.aws4.name
-  skip_final_snapshot   = true
-  tags = {
-    Name = "aakulov-aws4"
-  }
-}
-
-resource "aws_instance" "aws4" {
-  ami                         = var.ami
-  instance_type               = var.instance_type
-  key_name                    = var.key_name
-  vpc_security_group_ids      = [aws_security_group.aakulov-aws4.id]
-  subnet_id                   = aws_subnet.subnet_public.id
-  associate_public_ip_address = true
-  user_data                   = file("scripts/install_tfe.sh")
-  iam_instance_profile    = aws_iam_instance_profile.aakulov-aws4-ec2-s3.id
+  allocated_storage      = 20
+  max_allocated_storage  = 100
+  engine                 = "postgres"
+  engine_version         = "12.7"
+  name                   = "mydbtfe"
+  username               = "postgres"
+  password               = var.db_password
+  instance_class         = "db.t2.micro"
+  db_subnet_group_name   = aws_db_subnet_group.aws4.name
+  vpc_security_group_ids = [aws_security_group.aakulov-aws4.id]
+  skip_final_snapshot    = true
   tags = {
     Name = "aakulov-aws4"
   }
 }
 
 resource "aws_s3_bucket" "aws4" {
-  bucket = "aakulov-aws4-tfe-data"
-  acl    = "private"
+  bucket        = "aakulov-aws4-tfe-data"
+  acl           = "private"
   force_destroy = true
   tags = {
     Name = "aakulov-aws4-tfe-data"
@@ -245,10 +239,10 @@ resource "aws_s3_bucket" "aws4" {
 resource "aws_s3_bucket_public_access_block" "aws4" {
   bucket = aws_s3_bucket.aws4.id
 
-  block_public_acls   = true
-  block_public_policy = true
-  restrict_public_buckets = true 
-  ignore_public_acls = true
+  block_public_acls       = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+  ignore_public_acls      = true
 }
 
 resource "aws_iam_role" "aakulov-aws4-iam-role-ec2-s3" {
@@ -313,7 +307,50 @@ resource "aws_iam_role_policy" "aakulov-aws4-ec2-s3" {
   })
 }
 
+data "template_file" "settings_json_sh" {
+  template = file("templates/settings.json.sh.tpl")
+  vars = {
+    enc_password  = var.enc_password
+    hostname      = var.tfe_hostname
+    pgsqlhostname = aws_db_instance.aws4.address
+    pgsqlpassword = var.db_password
+    pguser        = aws_db_instance.aws4.username
+    s3bucket      = aws_s3_bucket.aws4.bucket
+    s3region      = var.region
+  }
+}
+
+data "template_cloudinit_config" "aws4_cloudinit" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    filename     = "settings.json.sh"
+    content_type = "text/x-shellscript"
+    content      = data.template_file.settings_json_sh.rendered
+  }
+
+  part {
+    filename     = "install_tfe.sh"
+    content_type = "text/x-shellscript"
+    content      = file("scripts/install_tfe.sh")
+  }
+}
+
+resource "aws_instance" "aws4" {
+  ami                         = var.ami
+  instance_type               = var.instance_type
+  key_name                    = var.key_name
+  vpc_security_group_ids      = [aws_security_group.aakulov-aws4.id]
+  subnet_id                   = aws_subnet.subnet_public.id
+  associate_public_ip_address = true
+  user_data                   = data.template_cloudinit_config.aws4_cloudinit.rendered
+  iam_instance_profile        = aws_iam_instance_profile.aakulov-aws4-ec2-s3.id
+  tags = {
+    Name = "aakulov-aws4"
+  }
+}
+
 output "aws_url" {
   value = aws_route53_record.aws4.name
 }
-
