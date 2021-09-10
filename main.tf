@@ -340,6 +340,7 @@ resource "aws_instance" "aws4" {
   associate_public_ip_address = true
   user_data                   = data.template_cloudinit_config.aws4_cloudinit.rendered
   iam_instance_profile        = aws_iam_instance_profile.aakulov-aws4-ec2-s3.id
+
   tags = {
     Name = "aakulov-aws4"
   }

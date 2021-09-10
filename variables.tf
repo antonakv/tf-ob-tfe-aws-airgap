@@ -16,5 +16,5 @@ variable "enc_password" {
   sensitive = true
 }
 variable "tfe_hostname" {
-  type      = string
+  type = string
 }

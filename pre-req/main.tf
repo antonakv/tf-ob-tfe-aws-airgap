@@ -86,20 +86,6 @@ resource "aws_s3_bucket_object" "upload1" {
   etag = filemd5("upload/latest.tar.gz")
 }
 
-resource "aws_s3_bucket_object" "upload2" {
-  bucket = aws_s3_bucket.aws4-airgap.id
-  key = "replicated.conf"
-  source = "upload/replicated.conf"
-  etag = filemd5("upload/replicated.conf")
-}
-
-resource "aws_s3_bucket_object" "upload3" {
-  bucket = aws_s3_bucket.aws4-airgap.id
-  key = "settings.json"
-  source = "upload/settings.json"
-  etag = filemd5("upload/settings.json")
-}
-
 resource "aws_s3_bucket_object" "upload4" {
   bucket = aws_s3_bucket.aws4-airgap.id
   key = "license.rli"
@@ -109,9 +95,9 @@ resource "aws_s3_bucket_object" "upload4" {
 
 resource "aws_s3_bucket_object" "upload5" {
   bucket = aws_s3_bucket.aws4-airgap.id
-  key = "Terraform Enterprise - 557.airgap"
-  source = "upload/Terraform Enterprise - 557.airgap"
-  etag = filemd5("upload/Terraform Enterprise - 557.airgap")
+  key = "tfe-557.airgap"
+  source = "upload/tfe-557.airgap"
+  etag = filemd5("upload/tfe-557.airgap")
 }
 
 
