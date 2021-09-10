@@ -115,12 +115,31 @@ echo "
 }
 " > /home/ubuntu/install/settings.json
 
+echo "
+{
+    "DaemonAuthenticationType":     "password",
+    "DaemonAuthenticationPassword": "Password1#",
+    "TlsBootstrapType":             "server-path",
+    "TlsBootstrapHostname":         "${hostname}",
+    "TlsBootstrapCert":             "/home/ubuntu/install/server.crt",
+    "TlsBootstrapKey":              "/home/ubuntu/install/server.key",
+    "BypassPreflightChecks":        true,
+    "ImportSettingsFrom":           "/home/ubuntu/install/settings.json",
+    "LicenseFileLocation":          "/home/ubuntu/install/license.rli",
+    "LicenseBootstrapAirgapPackagePath": "/home/ubuntu/install/tfe-557.airgap"
+}" > /home/ubuntu/install/replicated.conf
+
+echo "${cert_pem}" > home/ubuntu/install/server.crt
+
+echo "${key_pem}" > home/ubuntu/install/server.key
+
 IPADDR=$(hostname -I | awk '{print $1}')
-mkdir -p /home/ubuntu/install
+
 cd /home/ubuntu/install
 aws s3 cp s3://aakulov-aws4-tfe-airgap . --recursive
 tar -xf latest.tar.gz
-aws s3 cp s3://aakulov-aws4-tfe-airgap/Terraform\ Enterprise\ -\ 557.airgap tfe557.airgap
-sudo rm Terraform\ Enterprise\ -\ 557.airgap
 sudo rm -rf /usr/share/keyrings/docker-archive-keyring.gpg
-yes | sudo ./install.sh no-proxy private-address=$IPADDR public-address=$IPADDR
+cp /home/ubuntu/install/replicated.conf /etc/replicated.conf
+cp /home/ubuntu/install/replicated.conf /root/replicated.conf
+chown -R ubuntu: /home/ubuntu/install
+yes | sudo ./install.sh airgap no-proxy private-address=$IPADDR public-address=$IPADDR
