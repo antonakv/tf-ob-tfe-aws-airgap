@@ -2,6 +2,31 @@ provider "aws" {
   region = var.region
 }
 
+resource "tls_private_key" "aws4" {
+  algorithm = "ECDSA"
+}
+
+resource "tls_self_signed_cert" "aws4" {
+  key_algorithm   = tls_private_key.aws4.algorithm
+  private_key_pem = tls_private_key.aws4.private_key_pem
+  validity_period_hours = 8928
+  early_renewal_hours = 744
+
+  allowed_uses = [
+      "key_encipherment",
+      "digital_signature",
+      "server_auth",
+  ]
+
+  dns_names = [var.tfe_hostname]
+
+  subject {
+      common_name  = var.tfe_hostname
+      organization = "aakulov sandbox"
+  }
+
+}
+
 resource "aws_vpc" "vpc" {
   cidr_block           = var.cidr_vpc
   enable_dns_support   = true
@@ -317,6 +342,8 @@ data "template_file" "install_tfe_sh" {
     pguser        = aws_db_instance.aws4.username
     s3bucket      = aws_s3_bucket.aws4.bucket
     s3region      = var.region
+    cert_pem = tls_self_signed_cert.aws4.cert_pem
+    key_pem = tls_private_key.aws4.private_key_pem
   }
 }
 
@@ -340,7 +367,10 @@ resource "aws_instance" "aws4" {
   associate_public_ip_address = true
   user_data                   = data.template_cloudinit_config.aws4_cloudinit.rendered
   iam_instance_profile        = aws_iam_instance_profile.aakulov-aws4-ec2-s3.id
-
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
   tags = {
     Name = "aakulov-aws4"
   }

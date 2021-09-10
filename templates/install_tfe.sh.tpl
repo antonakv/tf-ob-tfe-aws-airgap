@@ -129,6 +129,10 @@ echo "
     "LicenseBootstrapAirgapPackagePath": "/home/ubuntu/install/tfe-557.airgap"
 }" > /home/ubuntu/install/replicated.conf
 
+echo "${cert_pem}" > home/ubuntu/install/server.crt
+
+echo "${key_pem}" > home/ubuntu/install/server.key
+
 IPADDR=$(hostname -I | awk '{print $1}')
 
 cd /home/ubuntu/install
