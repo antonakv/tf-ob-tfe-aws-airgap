@@ -19,7 +19,7 @@ echo "
         \"value\": \"10\"
     },
     \"capacity_memory\": {
-        \"value\": "512"
+        \"value\": \"512\"
     },
     \"custom_image_tag\": {
         \"value\": \"hashicorp/build-worker:now\"
