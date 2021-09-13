@@ -7,22 +7,22 @@ resource "tls_private_key" "aws4" {
 }
 
 resource "tls_self_signed_cert" "aws4" {
-  key_algorithm   = tls_private_key.aws4.algorithm
-  private_key_pem = tls_private_key.aws4.private_key_pem
+  key_algorithm         = tls_private_key.aws4.algorithm
+  private_key_pem       = tls_private_key.aws4.private_key_pem
   validity_period_hours = 8928
-  early_renewal_hours = 744
+  early_renewal_hours   = 744
 
   allowed_uses = [
-      "key_encipherment",
-      "digital_signature",
-      "server_auth",
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
   ]
 
   dns_names = [var.tfe_hostname]
 
   subject {
-      common_name  = var.tfe_hostname
-      organization = "aakulov sandbox"
+    common_name  = var.tfe_hostname
+    organization = "aakulov sandbox"
   }
 
 }
@@ -342,8 +342,8 @@ data "template_file" "install_tfe_sh" {
     pguser        = aws_db_instance.aws4.username
     s3bucket      = aws_s3_bucket.aws4.bucket
     s3region      = var.region
-    cert_pem = tls_self_signed_cert.aws4.cert_pem
-    key_pem = tls_private_key.aws4.private_key_pem
+    cert_pem      = tls_self_signed_cert.aws4.cert_pem
+    key_pem       = tls_private_key.aws4.private_key_pem
   }
 }
 
