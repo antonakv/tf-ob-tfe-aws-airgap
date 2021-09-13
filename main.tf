@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "tls_private_key" "aws4" {
-  algorithm = "ECDSA"
+  algorithm = "RSA"
 }
 
 resource "tls_self_signed_cert" "aws4" {
