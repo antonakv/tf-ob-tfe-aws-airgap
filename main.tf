@@ -36,25 +36,25 @@ resource "aws_vpc" "vpc" {
   }
 }
 
-resource "aws_subnet" "subnet_private" {
+resource "aws_subnet" "subnet_private1" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = var.cidr_subnet1
   availability_zone = "eu-central-1b"
 }
 
-resource "aws_subnet" "subnet_private1" {
+resource "aws_subnet" "subnet_private2" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = var.cidr_subnet3
   availability_zone = "eu-central-1c"
 }
 
-resource "aws_subnet" "subnet_public" {
+resource "aws_subnet" "subnet_public1" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = var.cidr_subnet2
   availability_zone = "eu-central-1b"
 }
 
-resource "aws_subnet" "subnet_public1" {
+resource "aws_subnet" "subnet_public2" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = var.cidr_subnet4
   availability_zone = "eu-central-1c"
@@ -73,7 +73,7 @@ resource "aws_eip" "aws4" {
 
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.aws4.id
-  subnet_id     = aws_subnet.subnet_public.id
+  subnet_id     = aws_subnet.subnet_public1.id
   depends_on    = [aws_internet_gateway.igw]
   tags = {
     Name = "aakulov-aws4"
@@ -109,12 +109,12 @@ resource "aws_route_table" "aws4-public" {
 }
 
 resource "aws_route_table_association" "aws4-private" {
-  subnet_id      = aws_subnet.subnet_private.id
+  subnet_id      = aws_subnet.subnet_private1.id
   route_table_id = aws_route_table.aws4-private.id
 }
 
 resource "aws_route_table_association" "aws4-public" {
-  subnet_id      = aws_subnet.subnet_public.id
+  subnet_id      = aws_subnet.subnet_public1.id
   route_table_id = aws_route_table.aws4-public.id
 }
 
@@ -229,7 +229,7 @@ resource "aws_route53_record" "aws4" {
 
 resource "aws_db_subnet_group" "aws4" {
   name       = "aakulov-aws4"
-  subnet_ids = [aws_subnet.subnet_public.id, aws_subnet.subnet_public1.id, aws_subnet.subnet_private.id, aws_subnet.subnet_private1.id]
+  subnet_ids = [aws_subnet.subnet_public1.id, aws_subnet.subnet_public2.id, aws_subnet.subnet_private1.id, aws_subnet.subnet_private2.id]
   tags = {
     Name = "aakulov-aws4"
   }
@@ -363,7 +363,7 @@ resource "aws_instance" "aws4" {
   instance_type               = var.instance_type
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.aakulov-aws4.id]
-  subnet_id                   = aws_subnet.subnet_public.id
+  subnet_id                   = aws_subnet.subnet_public1.id
   associate_public_ip_address = true
   user_data                   = data.template_cloudinit_config.aws4_cloudinit.rendered
   iam_instance_profile        = aws_iam_instance_profile.aakulov-aws4-ec2-s3.id
