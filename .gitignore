@@ -17,6 +17,7 @@ vendor/
 *.pem
 *.lock.hcl
 .terraform
+.terraform*
 *.tfstate*
 
 Gemfile.lock
