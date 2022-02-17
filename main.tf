@@ -243,7 +243,7 @@ resource "aws_db_instance" "aws4" {
   name                   = "mydbtfe"
   username               = "postgres"
   password               = var.db_password
-  instance_class         = "db.t2.micro"
+  instance_class         = "db.t3.medium"
   db_subnet_group_name   = aws_db_subnet_group.aws4.name
   vpc_security_group_ids = [aws_security_group.aakulov-aws4.id]
   skip_final_snapshot    = true
