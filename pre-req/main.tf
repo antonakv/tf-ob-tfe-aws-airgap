@@ -100,6 +100,12 @@ resource "aws_s3_bucket_object" "tfe557airgap" {
   etag = filemd5("upload/tfe-557.airgap")
 }
 
+resource "aws_s3_bucket_object" "tfe595airgap" {
+  bucket = aws_s3_bucket.aws4-airgap.id
+  key = "tfe-595.airgap"
+  source = "upload/tfe-595.airgap"
+  etag = filemd5("upload/tfe-595.airgap")
+}
 
 output "s3_bucket_for_tf-ob-tfe-aws-airgap" {
   value = aws_s3_bucket.aws4-airgap.arn
